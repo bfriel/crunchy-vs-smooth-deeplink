@@ -16,6 +16,9 @@ const programID = new PublicKey(idl.metadata.address);
 const onConnectRedirectLink = Linking.createURL("onConnect");
 const onDisconnectRedirectLink = Linking.createURL("onDisconnect");
 
+const buildUrl = (path: string, params: URLSearchParams) =>
+  `https://phantom.app/ul/v1/${path}?${params.toString()}`;
+
 const decryptPayload = (
   data: string,
   nonce: string,
@@ -126,7 +129,6 @@ export default function App() {
   }, []);
 
   const connect = async () => {
-    const baseUrl = "https://phantom.app/ul/v1/";
     const params = new URLSearchParams({
       dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
       cluster: "mainnet-beta",
@@ -134,7 +136,7 @@ export default function App() {
       redirect_link: onConnectRedirectLink,
     });
 
-    const url = `${baseUrl}connect?${params.toString()}`;
+    const url = buildUrl("connect", params);
 
     Linking.openURL(url);
   };
@@ -146,8 +148,6 @@ export default function App() {
 
     const [nonce, encryptedPayload] = encryptPayload(payload, sharedSecret);
 
-    const baseUrl = "https://phantom.app/ul/v1/";
-
     const params = new URLSearchParams({
       dapp_encryption_public_key: bs58.encode(dappKeyPair.publicKey),
       nonce: bs58.encode(nonce),
@@ -155,7 +155,7 @@ export default function App() {
       payload: bs58.encode(encryptedPayload),
     });
 
-    const url = `${baseUrl}disconnect?${params.toString()}`;
+    const url = buildUrl("disconnect", params);
 
     Linking.openURL(url);
   };
